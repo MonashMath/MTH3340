@@ -1,0 +1,13 @@
+name = "MTH3340"
+uuid = "3d7d43c7-e324-4858-a1c5-9820f458514f"
+authors = ["Santiago Badia <santiago.badia@monash.edu>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
