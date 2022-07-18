@@ -6,6 +6,7 @@
 
 
 # Welcome to Unit MTH3340
+
 Welcome to Unit MTH3340
 MTH3340 will introduce you to the numerical approximation of partial differential equations. (PDEs). As you probably know at this stage, the analytical solution of PDEs is only feasible in very limited situations (simple geometries and differential operators).
 
@@ -17,3 +18,11 @@ One constructive way to define these approximation spaces is the finite element 
 Finite element methods transform PDEs into discrete (linear or nonlinear) algebraic systems. Discrete systems can readily be computed using computers. However, the size of these discrete problems increases with the number of elements (more accuracy implies more computational cost). Not surprisingly, the most complex applications (e.g., mantle convection on the Earth's crust or the flow around an aircraft) require supercomputers to be solved accurately.
 
 In this unit, we will go through all these methods, paying particular attention to their mathematical foundations. In any case, we will also learn how to implement these algorithms and use advanced scientific software [`Gridap`](https://github.com/gridap/Gridap.jl) to run these methods and gain intuition. `Gridap` is written in Julia, a pretty recent programming language. Thus, we will use Julia in MTH3340.
+
+# Installing `Julia` and running the tutorials
+
+Please check [here](https://github.com/MonashMath/MTH3340/blob/main/TUTORIALS.md)
+
+# Lecture notes for this unit
+
+Find the lecture notes [here]()
