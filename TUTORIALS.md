@@ -1,10 +1,8 @@
 # Computational finite element tutorials
 
-These tutorials are delivered by [@santiagobadia](https://github.com/santiagobadia).
-
 In this set of tutorials, we will use the [`Gridap`](https://github.com/gridap/Gridap.jl) software library developed by [@santiagobadia](https://github.com/santiagobadia) and co-workers. This library provides tools for the numerical approximation of partial differential equations using mesh-based techniques (finite element methods in general). The library is written in [`Julia`](https://julialang.org), a somehow recent programming language that combines the expressiveness of dynamic languages like `Python` and the performance of static languages like `C++` or `FORTRAN`.
 
-It is not the aim of this course to teach `Julia`, and you are not going to be asked to implement very advanced algorithms from scratch. What will be presented can be understood without a thorough primer in `Julia`. It is more about understanding the steps in a finite element software (mesh generation, creation of finite element spaces, bilinear forms, linear system, and solver) and justifying the results obtained using what we have learned from their mathematical analysis.
+The tutorials are mainly about understanding the steps in a finite element software (mesh generation, creation of finite element spaces, bilinear forms, linear system, and solver) and justifying the results obtained using what we have learned from their mathematical analysis. The `Julia` requirements for this unit are quite low and can be understood with the guidance and examples in the tutorials. 
 
 ## Installing `Julia`
 
@@ -12,7 +10,7 @@ For this practical work, you need to install Julia locally on your computer. Ins
 
 If you install Julia on Windows, you can accept the proposed directory for installation (unless you want to change it for some reason), press _NEXT_, tick **(very important)** `Add Julia Path` in the next window, press _NEXT_. You can tick `Run Julia` if you like in the last window and _FINISH_. You will have now the `Julia` app in Windows, and you can use it to open new `Julia` windows. I think something very similar will work on Mac.
 
-If you install `Julia` in `Linux`, you will need to manually add the folder with the `Julia` executable to the environment variable `PATH` in your `.bashrc`, e.g.:
+If you install `Julia` in `Linux`, you will need to manually add the folder with the `Julia` executable to the environment variable `PATH` in your `.bashrc`, e.g. (for version 1.6.1):
 ```
 export PATH=$HOME/Progs/julia-1.6.1/bin
 ```
