@@ -27,9 +27,11 @@ If everything worked, now you should be able to open a `Julia` REPL (a `Julia` t
 
 ## Download the tutorials
 
-Every tutorial is related to one chapter of the lecture note. You will find the tutorials below (during the semester):
+I will create tutorials for this specific unit. Every tutorial is related to one chapter of the lecture note. You will find the tutorials below (during the semester):
 
 * Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
+
+Besides, if you are interested in more complex problems and more advanced tutorials, you can always check the `Gridap` tutorials [here](https://gridap.github.io/Tutorials/dev/). I recommend to take a look at the three first tutorials in the list, if interested. 
 
 ## Run the tutorials using `Pluto`
 
