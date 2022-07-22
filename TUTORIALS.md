@@ -27,7 +27,7 @@ If everything worked, now you should be able to open a `Julia` REPL (a `Julia` t
 
 ## Download the tutorials
 
-Now, you can download the .zip with the tutorials [here](https://github.com/MonashMath/MTH4321/archive/refs/heads/master.zip). Every tutorial is related to one chapter of the lecture note. You can find:
+Every tutorial is related to one chapter of the lecture note. You will find the tutorials below (during the semester):
 
 * Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
 
