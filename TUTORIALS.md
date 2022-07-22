@@ -42,15 +42,26 @@ Now, go to `File -> Open Folder` (or just click on the Explorer icon on the left
 ```
 julia> 
 ```
-This is the _standard_ mode of the `Julia` REPL, in which you can run commands. However, in order to run the tutorials, we need to install some packages and type `] instantiate`. 
-
-Instantiate the environment. This will automatically download all required packages.
+This is the _standard_ mode of the `Julia` REPL, in which you can run commands. However, in order to run the tutorials, we need to activate and instantiate the `MTH3340` project:
 ```
 # Type ] to enter in pkg mode
+(MTH3340) pkg> activate .
 (MTH3340) pkg> instantiate
 ```
+This will automatically download all required packages.
 
-Note that `]` will change the prompt to package mode (`(Tutorials) pkg>`). To go to normal mode again you just press `backspace` key. It is good to know that you can have the REPL in these two modes. The standard mode `julia>` is the one that you will use all the time to run commands. The package mode is only used for packages related things (e.g., instantiate a project or install new packages). Instantiate will install the Julia packages that are required to run the tutorials (Gridap and its dependencies). It will take some time. If there are no errors, you can start running the tutorial (open the desired tutorial in `src/` folder). You can just go to the `Explore` icon on the top-left and click on the tutorial you want to run.
+Note that `]` will change the prompt to package mode (`(Tutorials) pkg>`). To go to normal mode again you just press `backspace` key. It is good to know that you can have the REPL in these two modes. The standard mode `julia>` is the one that you will use all the time to run commands. The package mode is only used for packages related things (e.g., activate or instantiate a project or install new packages). Activate will pick the environment (the MTH3340 project in our case). Instantiate will install the Julia packages that are required to run the tutorials (Gridap and its dependencies). It will take some time. If there are no errors, you can start running the tutorials.
+
+You can now run the tutorials using `Pluto`:
+```julia
+julia> using Pluto
+julia> Pluto.run()
+```
+It will open a new tab in your browser (hopefully). Then, you can just open the one you want in `notebooks/`.
+
+# Running your own files
+
+We can also run files appart from notebooks without `Pluto`. First, open the file (e.g., open `src/SampleFile.jl`). You can just go to the `Explore` icon on the top-left and click on the file you want to run.
 
 First, check that you are in standard mode `julia>`, if you are in package mode `(MTH3340) pkg>` type backspace. You can run a `Julia` file in many different ways. I would probably start running the whole file to check that everything is OK. As usual, open the VSCode search using `CTRL+SHIFT+P` and search for `Julia execute file in REPL` and choose this option.
 
