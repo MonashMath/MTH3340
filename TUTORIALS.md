@@ -29,13 +29,7 @@ If everything worked, now you should be able to open a `Julia` REPL (a `Julia` t
 
 Now, you can download the .zip with the tutorials [here](https://github.com/MonashMath/MTH4321/archive/refs/heads/master.zip). Every tutorial is related to one chapter of the lecture note. You can find:
 
-* Practical tutorial Chapter 1: In `Tutorials.jl/src/t1-gridap-poisson.jl`
-
-* Practical tutorial Chapter 2: In `Tutorials.jl/src/t2-gridap-convergence-tests.jl`
-
-* Practical tutorial Chapter 3: In `Tutorials.jl/src/t3-low-level-poisson-solver.jl`
-
-* Practical assignment: In `Tutorials.jl/src/assignment.jl`
+* Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
 
 ## Run the tutorials in VSCode
 
