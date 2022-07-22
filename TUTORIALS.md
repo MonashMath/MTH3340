@@ -31,11 +31,13 @@ Every tutorial is related to one chapter of the lecture note. You will find the 
 
 * Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
 
-The tutorials are `Pluto` notebooks (a more advanced version of Jupyter notebooks for Julia). Please, follow the installation instructions [here](https://github.com/fonsp/Pluto.jl#installation). You can simply download the notebook and open it in the browser, after running `Pluto`.
+# Run the tutorials using `Pluto`
+
+The tutorials are `Pluto` notebooks (a more advanced version of Jupyter notebooks for Julia). Please, follow the installation instructions [here](https://github.com/fonsp/Pluto.jl#installation). You can simply download the notebook and open it in the browser, after running `Pluto`. This will open a browser window. Navigate to the `notebooks` folder and open the tutorial you want. Voila!
 
 ## Run the tutorials in VSCode
 
-Now, go to `File -> Open Folder` (or just click on the Explorer icon on the left) and open `Tutorials.jl`. Next, open a Julia REPL (as explained above). You have in the bottom of your VSCode windows
+Now, go to `File -> Open Folder` (or just click on the Explorer icon on the left) and open `MTH3340`. Next, open a Julia REPL (as explained above). You have in the bottom of your VSCode windows
 
 ```
 julia> 
@@ -45,34 +47,17 @@ This is the _standard_ mode of the `Julia` REPL, in which you can run commands. 
 Instantiate the environment. This will automatically download all required packages.
 ```
 # Type ] to enter in pkg mode
-(Tutorials) pkg> instantiate
+(MTH3340) pkg> instantiate
 ```
 
 Note that `]` will change the prompt to package mode (`(Tutorials) pkg>`). To go to normal mode again you just press `backspace` key. It is good to know that you can have the REPL in these two modes. The standard mode `julia>` is the one that you will use all the time to run commands. The package mode is only used for packages related things (e.g., instantiate a project or install new packages). Instantiate will install the Julia packages that are required to run the tutorials (Gridap and its dependencies). It will take some time. If there are no errors, you can start running the tutorial (open the desired tutorial in `src/` folder). You can just go to the `Explore` icon on the top-left and click on the tutorial you want to run.
 
-First, check that you are in standard mode `julia>`, if you are in package mode `(tutorials) pkg>` type backspace. You can run a `Julia` file in many different ways. I would probably start running the whole file to check that everything is OK. As usual, open the VSCode search using `CTRL+SHIFT+P` and search for `Julia execute file in REPL` and choose this option. If everything works, you will see a message with the L2 error of your solution.
+First, check that you are in standard mode `julia>`, if you are in package mode `(MTH3340) pkg>` type backspace. You can run a `Julia` file in many different ways. I would probably start running the whole file to check that everything is OK. As usual, open the VSCode search using `CTRL+SHIFT+P` and search for `Julia execute file in REPL` and choose this option.
 
 For reading the comments (in which I explain what we are doing in the code), I recommend using "soft wrapping of lines". Just press `ALT+Z` or go to `View > Toggle Word Wrap`.
 
-In order to go through the tutorials, I strongly recommend executing line by line from the very beginning. You can do that with `CTRL+ENTER` on a line. Then, you can see the result in the REPL, and try to understand the numbers you are getting. If you click on the `Julia` link on the left (the three circles) you will be able to see the Workspace (as in Matlab) with all the variables and their values.
+In order to go through code files, I strongly recommend executing line by line from the very beginning. You can do that with `CTRL+ENTER` on a line. Then, you can see the result in the REPL, and try to understand the numbers you are getting. If you click on the `Julia` link on the left (the three circles) you will be able to see the Workspace (as in Matlab) with all the variables and their values.
 
-Now, you can run the whole terminal, and understand what we are doing at every stage. Try to check how the code relates to the lecture notes, and check that we are implementing exactly matches what we explain there.
+Now, you can run the whole code and understand what we are doing at every stage. Try to check how the code relates to the lecture notes, and check that we are implementing exactly matches what we explain there.
 
 Let me know if there is any technical problem or doubts in the tutorial. Have fun!
-
-# Creating Jupyter Notebooks
-
-If you want, you can also run the tutorials using Jupyter notebooks. I think it is better to run the code in VSCode. In any case, here you can see how to do that.
-
-Build the notebooks
-```
-# Type Ctrl+C to get back to command mode
-julia> include("deps/build.jl")
-```
-
-Open the notebooks
-```
-julia> using IJulia
-julia> notebook(dir=pwd())
-```
-This will open a browser window. Navigate to the `notebooks` folder and open the tutorial you want. Voila!
