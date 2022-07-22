@@ -25,4 +25,4 @@ Please check [here](https://github.com/MonashMath/MTH3340/blob/main/TUTORIALS.md
 
 # Lecture notes for this unit
 
-Find the lecture notes [here]()
+Find the lecture notes [here](https://github.com/MonashMath/MTH3340/blob/main/assets/mth3340-lecture-notes.pdf)
