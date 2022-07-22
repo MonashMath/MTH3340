@@ -61,7 +61,7 @@ It will open a new tab in your browser (hopefully). Then, you can just open the 
 
 # Running your own files
 
-We can also run files appart from notebooks without `Pluto`. First, open the file (e.g., open `src/SampleFile.jl`). You can just go to the `Explore` icon on the top-left and click on the file you want to run.
+We can also run files apart from notebooks without `Pluto`. First, open the file (e.g., open `src/SampleFile.jl`). You can just go to the `Explore` icon on the top-left and click on the file you want to run.
 
 First, check that you are in standard mode `julia>`, if you are in package mode `(MTH3340) pkg>` type backspace. You can run a `Julia` file in many different ways. I would probably start running the whole file to check that everything is OK. As usual, open the VSCode search using `CTRL+SHIFT+P` and search for `Julia execute file in REPL` and choose this option.
 
