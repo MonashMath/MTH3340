@@ -31,6 +31,8 @@ Every tutorial is related to one chapter of the lecture note. You will find the 
 
 * Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
 
+The tutorials are `Pluto` notebooks (a more advanced version of Jupyter notebooks for Julia). Please, follow the installation instructions [here](https://github.com/fonsp/Pluto.jl#installation). You can simply download the notebook and open it in the browser, after running `Pluto`.
+
 ## Run the tutorials in VSCode
 
 Now, go to `File -> Open Folder` (or just click on the Explorer icon on the left) and open `Tutorials.jl`. Next, open a Julia REPL (as explained above). You have in the bottom of your VSCode windows
