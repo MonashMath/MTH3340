@@ -31,13 +31,13 @@ Every tutorial is related to one chapter of the lecture note. You will find the 
 
 * Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
 
-# Run the tutorials using `Pluto`
+## Run the tutorials using `Pluto`
 
-The tutorials are `Pluto` notebooks (a more advanced version of Jupyter notebooks for Julia). Please, follow the installation instructions [here](https://github.com/fonsp/Pluto.jl#installation). You can simply download the notebook and open it in the browser, after running `Pluto`. This will open a browser window. Navigate to the `notebooks` folder and open the tutorial you want. Voila!
+The tutorials are `Pluto` notebooks (a more advanced version of Jupyter notebooks for Julia). Please, follow the installation instructions [here](https://github.com/fonsp/Pluto.jl#installation). You can simply download the notebook. Next, run `Pluto`, which will open a tab in the browser. In the browser, open the notebook file you have downloaded. Voila!
 
-## Run the tutorials in VSCode
+## Run the tutorials in VSCode (activating MTH3340)
 
-Now, go to `File -> Open Folder` (or just click on the Explorer icon on the left) and open `MTH3340`. Next, open a Julia REPL (as explained above). You have in the bottom of your VSCode windows
+It is better to download the whole project from `Github` (click the `Code` icon in the [main page](https://github.com/MonashMath/MTH3340). Then, go to `File -> Open Folder` (or just click on the Explorer icon on the left) and open `MTH3340`. Next, open a Julia REPL (as explained above). You have in the bottom of your VSCode windows
 
 ```
 julia> 
