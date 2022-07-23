@@ -49,4 +49,26 @@ Let us consider a very complex problem in geosciences, the _mantle convection_ i
 
 In this example, our unknowns are the velocity, pressure, and temperature in the Earth's mantle. These equations are just impossible to solve analytically (unless very simple PDEs on very simple domains). As commented above, computers are not that clever and can just do basic arithmetical and logical operations. To solve PDEs is certainly something computers (but also humans) cannot do in general. As a result we humans have to find models that are _close_ to the differential equations but _only_ involve basic (but probably a huge number!) arithmetic operations that can be carried out by a supercomputer. Thus, what we can do is to _approximate__ the solution of these equations using computers.
 
-We will learn how to do that in this unit!
+Numerical methods for the approximation of PDEs (finite differences) transform this system of equations into a set of _linear systems_ of equations. In order to do that, in the case of PDE-governed models, numerical methods rely on meshes (e.g., triangulations) that can be found in this [source](http://mathis.colorado.edu/szhong/papers/BursteddeGhattasGurnisEtAl08.pdf). 
+
+![Meshes in a mantle convection simulation](figs-cs/mantle-convection-mesh.png)
+
+Now, the unknowns are not functions but values (velocity, pressure and temperature) at the nodes of this mesh. Thus, our unknown is just an array of real numbers. On the other hand, instead of derivatives of functions, we replace these operators by simple equations. 
+
+You are probably familiar with a specific numerical method for PDEs, the **finite difference method**. It relies on approximations of derivatives 
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\mathrm{d}f}{\mathrm{d}x}&space;=&space;f(x&plus;h)-f(x)&plus;\mathrm{error}(h)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\mathrm{d}f}{\mathrm{d}x}&space;=&space;f(x&plus;h)-f(x)&plus;\mathrm{error}(h)" title="\frac{\mathrm{d}f}{\mathrm{d}x} = f(x+h)-f(x)+\mathrm{error}(h)" /></a>
+
+using Taylor's formula. After this transformation, we are committing an error, but we, numerical analysts, can prove mathematically how these errors are bound, how increasing computational resources (e.g., finer meshes) we tend to the exact solution, etc. 
+
+Finite difference methods have many limitations, e.g., they cannot be readily applied to complex geometries. More advanced numerical methods for PDEs are finite element and finite volume schemes. Finite volume schemes are usually favoured for hyperbolic PDEs, while finite elements can be applied for any PDE. In this unit, we will focus on finite element methods. These methods do rely on _weak_ forms of PDEs and functional analysis. The idea is that the solution $u(x)$ of our problem belongs to a known infinite-dimensional space $V$. Finite elements replace the infinite-dimensional space $V$ by a finite-dimensional one $V_h$ that is _close enough_ to $V$. This unit will be about a brief introduction to functionl analysis, weak form of PDEs, Galerkin approximation, finite element spaces, its numerical analysis and its implementation.
+
+As a result of all these methods, the original problem can be rewritten as a (set of) linear systems of equations. Usually, the resulting matrices are very sparse (most entries are zero) and have nice sparsity patterns. A linear system of equations _can be_ solved by a computer; e.g., Gaussian elimination only involves basic operations.
+
+![Sparsity pattern of a matrix after PDE discretisation (red dots represent non-zero entries)](figs-cs/sparse-matrix.png)
+
+The number of nodes in complex 3D problems (which is related to the number of equations in the resulting linear system) can be __HUGE__; the largest problem so far in PDE-related simulations is $10^13$ equations! Thus, we cannot solve these problems in a personal computer. Instead we have to use so-called supercomputers. The huge improvements in computational power have allowed us scientists solve problems that were impossible years ago. In any case, algorithmic developments have had even more impact on what we can solve now. You can see that the meshes above have different resolution in different areas. These meshes evolve with the solution, in order to capture the smallest details. This way, researchers have been able to reduced about 1000 times the computational cost of these simulations, compared to using a brute force approach with meshes that have same resolution everywhere.
+
+After all this process, we are able to predict mantle convection using computers, as you can see in these [videos](https://aspect.geodynamics.org/gallery.html).
+
+The software libraries that solve PDEs are pretty complex, and can easily involve millions of lines of code. Many of these software libraries are open source, you can take a look at the code, download it for free, use it and even modify it for your needs. Most of these codes can be found in open repository servers like `GitHub`. Here, you can find one of the scientific software projects I lead, [Gridap](https://github.com/gridap/Gridap.jl), which we will use during this unit. The mantle convection problem has been simulated with this [code](https://github.com/dealii/dealii).
