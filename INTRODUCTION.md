@@ -38,7 +38,7 @@ The most complex scientific problems are not been solved in personal computers b
 
 Applications of CSE can be found in virtually any scientific and engineering discipline (medicine, Earth sciences, biology, aeronautics, etc) and beyond (finance, sociology, etc).
 
-# MTH3340: Numerical Methods for Partial Differential Equations
+## MTH3340: Numerical Methods for Partial Differential Equations
 
 Many phenomena in nature are represented by mathematical models that are expressed in terms of [partial differential equations](https://en.wikipedia.org/wiki/Partial_differential_equation) (PDEs): the [Maxwell equations](https://en.wikipedia.org/wiki/Maxwell%27s_equations) for electromagnetism, the [Navier-Stokes equations](https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations) for fluids, the elasticity equations for solids, physical relativity, [Schrödinger equation](https://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation) in quantum mechanics, some cell migration models in living tissues, etc.
 
