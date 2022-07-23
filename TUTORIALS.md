@@ -74,3 +74,8 @@ In order to go through code files, I strongly recommend executing line by line f
 Now, you can run the whole code and understand what we are doing at every stage. Try to check how the code relates to the lecture notes, and check that we are implementing exactly matches what we explain there.
 
 Let me know if there is any technical problem or doubts in the tutorial. Have fun!
+
+# Learning basic Julia
+
+I have not created specific tutorials for basic Julia. The reason is that there are already excellent tutorials out there. You can take a look at the tutorials [here](https://julialang.org/learning/tutorials/). I recommend to read this [here](https://www.matecdev.com/posts/julia-tutorial-science-engineering.html). It provides the basics of what we will need during this unit (and more). But you can certainly explore other tutorials in the list above. And please ask me if you have questions!
+
