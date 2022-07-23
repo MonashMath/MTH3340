@@ -51,7 +51,7 @@ In this example, our unknowns are the velocity, pressure, and temperature in the
 
 Numerical methods for the approximation of PDEs (finite differences) transform this system of equations into a set of _linear systems_ of equations. In order to do that, in the case of PDE-governed models, numerical methods rely on meshes (e.g., triangulations) that can be found in this [source](http://mathis.colorado.edu/szhong/papers/BursteddeGhattasGurnisEtAl08.pdf). 
 
-![Meshes in a mantle convection simulation](figs-cs/mantle-convection-mesh.png)
+![Meshes in a mantle convection simulation](https://github.com/MonashMath/SCI1022/blob/master/figs-cs/mantle-convection-mesh.png)
 
 Now, the unknowns are not functions but values (velocity, pressure and temperature) at the nodes of this mesh. Thus, our unknown is just an array of real numbers. On the other hand, instead of derivatives of functions, we replace these operators by simple equations. 
 
@@ -65,7 +65,7 @@ Finite difference methods have many limitations, e.g., they cannot be readily ap
 
 As a result of all these methods, the original problem can be rewritten as a (set of) linear systems of equations. Usually, the resulting matrices are very sparse (most entries are zero) and have nice sparsity patterns. A linear system of equations _can be_ solved by a computer; e.g., Gaussian elimination only involves basic operations.
 
-![Sparsity pattern of a matrix after PDE discretisation (red dots represent non-zero entries)](figs-cs/sparse-matrix.png)
+![Sparsity pattern of a matrix after PDE discretisation (red dots represent non-zero entries)](https://github.com/MonashMath/SCI1022/blob/master/figs-cs/sparse-matrix.png)
 
 The number of nodes in complex 3D problems (which is related to the number of equations in the resulting linear system) can be __HUGE__; the largest problem so far in PDE-related simulations is $10^13$ equations! Thus, we cannot solve these problems in a personal computer. Instead we have to use so-called supercomputers. The huge improvements in computational power have allowed us scientists solve problems that were impossible years ago. In any case, algorithmic developments have had even more impact on what we can solve now. You can see that the meshes above have different resolution in different areas. These meshes evolve with the solution, in order to capture the smallest details. This way, researchers have been able to reduced about 1000 times the computational cost of these simulations, compared to using a brute force approach with meshes that have same resolution everywhere.
 
