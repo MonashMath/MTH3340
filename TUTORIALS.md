@@ -29,7 +29,7 @@ If everything worked, now you should be able to open a `Julia` REPL (a `Julia` t
 
 I will create tutorials for this specific unit. Every tutorial is related to one chapter of the lecture note. You will find the tutorials below (during the semester):
 
-* Practical tutorial Chapter 1: [https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl)
+* [Practical tutorial Chapter 1](https://github.com/MonashMath/MTH3340/blob/main/notebooks/tutorial-1.jl) or run it with [Binder](https://binder.plutojl.org/v0.19.4/open?url=https%253A%252F%252Fraw.githubusercontent.com%252FMonashMath%252FMTH3340%252Fmain%252Fnotebooks%252Ftutorial-1.jl)
 
 Besides, if you are interested in more complex problems and more advanced tutorials, you can always check the `Gridap` tutorials [here](https://gridap.github.io/Tutorials/dev/). I recommend to take a look at the three first tutorials in the list, if interested. 
 
