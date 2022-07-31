@@ -6,7 +6,7 @@ The tutorials are mainly about understanding the steps in a finite element softw
 
 ## Installing `Julia`
 
-For this practical work, you need to install Julia locally on your computer. Installing all the tools that are needed for running these notebooks locally is pretty simple. The first thing that you have to do is to download `Julia` from [here](https://julialang.org/downloads/). Pick the last LTS release for your operating system. If you use Windows and a not-too-old computer, download the 64-bit installer. I would recommend you install the newest stable release.
+For this practical work, you need to install Julia locally on your computer. Installing all the tools that are needed for running these notebooks locally is pretty simple. The first thing that you have to do is to download `Julia` from [here](https://julialang.org/downloads/).  I would recommend you install the newest stable release. Pick the one for your operating system. If you use Windows and a not-too-old computer, download the 64-bit installer.
 
 If you install Julia on Windows, you can accept the proposed directory for installation (unless you want to change it for some reason), press _NEXT_, tick **(very important)** `Add Julia Path` in the next window, press _NEXT_. You can tick `Run Julia` if you like in the last window and _FINISH_. You will have now the `Julia` app in Windows, and you can use it to open new `Julia` windows. I think something very similar will work on Mac.
 
