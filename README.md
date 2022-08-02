@@ -19,6 +19,10 @@ Finite element methods transform PDEs into discrete (linear or nonlinear) algebr
 
 In this unit, we will go through all these methods, paying particular attention to their mathematical foundations. In any case, we will also learn how to implement these algorithms and use advanced scientific software [`Gridap`](https://github.com/gridap/Gridap.jl) to run these methods and gain intuition. `Gridap` is written in Julia, a pretty recent programming language. Thus, we will use Julia in MTH3340.
 
+# Introduction
+
+Please check [here](https://github.com/MonashMath/MTH3340/blob/main/INTRODUCTION.md)
+
 # Installing `Julia` and running the tutorials
 
 Please check [here](https://github.com/MonashMath/MTH3340/blob/main/TUTORIALS.md)
