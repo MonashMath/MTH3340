@@ -10,6 +10,9 @@ using Gridap
 # ╔═╡ 2b1910b1-9629-4c0d-ba2d-289cf03d42c9
 using Plots
 
+# ╔═╡ 0290f466-864c-4a26-8c0d-1df7cf0ff665
+md"# Spectral elements"
+
 # ╔═╡ a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
 md"Below, we are defining a spectral method solver using Gridap."
 
@@ -1256,6 +1259,7 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─0290f466-864c-4a26-8c0d-1df7cf0ff665
 # ╟─a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
 # ╠═b102d193-0900-4e57-a83c-cb9198012618
 # ╟─2c10f483-b4ab-45b9-bdcc-36e737ec7a15
