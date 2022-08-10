@@ -147,6 +147,21 @@ eh1 = sqrt( sum( ∫( e*e + ∇(e)⋅∇(e) )dΩ ) )
 # ╔═╡ a2a7a5d8-6f21-410d-8942-681e1955b4b0
 md"We observe that the error is around machine precision, as one expects."
 
+# ╔═╡ 15910f70-271b-4b35-9875-370849cc7621
+md"# Tasks
+
+1. Create a function that, using `Gridap`, solves the Poisson problem in $[0,1]$ for a given order $p$ of the FE space and a given number of elements $N$ in the mesh. The solution $u(x)$ that we want to get using this method will also be an argument of this function. For that, the function will use the method of manufactured solutions. The function must return the $L^2$ and $H^1$ error of the FE solution.
+
+2. Create another function that calls the previous ones for a given order $p$ and different values of $N$, e.g., $N=2,4,8,16,32,64$. The function must save the $L^2$ and $H^1$ errors in an array and return them.
+
+Now, consider the method of manufactured solutions with $u(x) = \sin(2\pi x)$.
+
+3. Plot a log-log function with $x$ axis being $N$ and $y$ axis being the $L^2$ error. Idem for $H^1$ error. What can you say about the FE error? How it changes with $N$?
+
+4. Do the same for $p=2, 3, 4$ and $N=8$. What can you say about the FE error? How it changes with $p$?
+"
+
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1360,5 +1375,6 @@ version = "0.9.1+5"
 # ╟─0f6e0041-4dca-4f2c-92aa-8cb3485d4d5f
 # ╠═5c854ae7-dfb1-42a7-822d-6da93fc8fee8
 # ╟─a2a7a5d8-6f21-410d-8942-681e1955b4b0
+# ╟─15910f70-271b-4b35-9875-370849cc7621
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

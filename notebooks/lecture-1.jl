@@ -49,9 +49,9 @@ md"Now, we can play with both the order or approximation and solution we want to
 
 # ╔═╡ f1ace207-86d6-474c-a7bf-96971f6634bc
 begin
-  p=3
-  u(x) = sin(4*π*x[1])
-  # u(x) = x[1]^2+1
+  p=2
+  # u(x) = sin(4*π*x[1])
+  u(x) = x[1]^2+1
 end
 
 # ╔═╡ 6f2fa46f-19d1-4324-aad5-74197bfc260b
@@ -1267,13 +1267,13 @@ version = "1.4.1+0"
 # ╠═99fc7002-17d7-11ed-0012-b504f1a83d11
 # ╟─d37bad34-c122-4b4c-a677-aac82636d0ca
 # ╠═f1ace207-86d6-474c-a7bf-96971f6634bc
-# ╠═6f2fa46f-19d1-4324-aad5-74197bfc260b
+# ╟─6f2fa46f-19d1-4324-aad5-74197bfc260b
 # ╠═444d62c3-2ba8-4b57-9714-0a8ccc22ea82
 # ╠═33620bfc-aed2-47d8-8383-764d0a52d373
 # ╠═690175ba-d843-4d55-bc77-ec5fc3ed92cf
 # ╟─909f6d6b-e9c7-45b1-9204-35a2f1b217cf
 # ╠═2b1910b1-9629-4c0d-ba2d-289cf03d42c9
 # ╠═08748534-9586-4711-a8d2-256a7c5956d2
-# ╠═7879f72b-0c5b-492e-ab3c-b786d3961326
+# ╟─7879f72b-0c5b-492e-ab3c-b786d3961326
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
