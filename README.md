@@ -7,7 +7,6 @@
 
 # Welcome to Unit MTH3340
 
-Welcome to Unit MTH3340
 MTH3340 will introduce you to the numerical approximation of partial differential equations. (PDEs). As you probably know at this stage, the analytical solution of PDEs is only feasible in very limited situations (simple geometries and differential operators).
 
 Many problems of interest in science, engineering, medicine, etc., are modelled by PDEs. However, in practical situations, the analytical solution is not feasible. Therefore, the only way to extract information about these mathematical models is by approximation techniques, the main topic of this unit.
