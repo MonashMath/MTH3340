@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.8
 
 using Markdown
 using InteractiveUtils
@@ -152,13 +152,16 @@ md"# Tasks
 
 1. Create a function that, using `Gridap`, solves the Poisson problem in $[0,1]$ for a given order $p$ of the FE space and a given number of elements $N$ in the mesh. The solution $u(x)$ that we want to get using this method will also be an argument of this function. For that, the function will use the method of manufactured solutions. The function must return the $L^2$ and $H^1$ error of the FE solution.
 
-2. Create another function that calls the previous ones for a given order $p$ and different values of $N$, e.g., $N=2,4,8,16,32,64$. The function must save the $L^2$ and $H^1$ errors in an array and return them.
+2. Create another function that calls the previous ones for a given order $p$ and different values of $N$ provided in an array, e.g. `[2,4,8,16]`. The function must save the $L^2$ and $H^1$ errors in an array and return them.
 
 Now, consider the method of manufactured solutions with $u(x) = \sin(2\pi x)$.
 
-3. Plot a log-log function with $x$ axis being $N$ and $y$ axis being the $L^2$ error. Idem for $H^1$ error. What can you say about the FE error? How it changes with $N$?
+3. Consider $N=2^i$ for $i=2,\ldots,5$. Plot a log-log function with $x$ axis being $N$ and $y$ axis being the $L^2$ error. Compute the slope using linear regression (check the function that does this in Julia). Idem for $H^1$ error. What can you say about the FE error? How does it change with $N$?
 
-4. Do the same for $p=2, 3, 4$ and $N=8$. What can you say about the FE error? How it changes with $p$?
+4. Do the same for $p=2, 3, 4$ and $N=8$. What can you say about the FE error? How does it change with $p$?
+
+
+**Very important:** To compute the error, we must integrate a term with a trigonometrical function. Thus, we cannot integrate this term exactly. Consider a better integration than the one above (for polynomials), e.g., four times the degree of the quadrature used above. Otherwise, integration errors in the error norm could pollute the numerical error that we want to observe.
 "
 
 
