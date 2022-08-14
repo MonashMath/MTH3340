@@ -1,169 +1,84 @@
 ### A Pluto.jl notebook ###
-# v0.19.8
+# v0.19.11
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 92080451-a4ee-471e-a7b9-d26702ec802e
+# ╔═╡ b102d193-0900-4e57-a83c-cb9198012618
 using Gridap
 
-# ╔═╡ 343828e3-018b-4155-b860-2e4733d57fee
+# ╔═╡ 2b1910b1-9629-4c0d-ba2d-289cf03d42c9
 using Plots
 
-# ╔═╡ 26f700b4-0958-11ed-0249-83548500e23c
-md"# _Tutorial 1: A Poisson solver in `Gridap`_
+# ╔═╡ 0290f466-864c-4a26-8c0d-1df7cf0ff665
+md"# Finite element methods in 1D"
 
-We are going to use an advanced finite element code to observe how spectral
-Galerkin and finite element methods work in practise. Due to the limited time we
-have in this course, I have decided to use the software implementation in `Gridap`,
-which I co-develop. This software is written in `Julia`. If you do not know about `Julia`,
-no worries. You won't need much for following the tutorials.
+# ╔═╡ a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
+md"Below, we are defining a finite element method solver in 1D using Gridap."
 
-The code we will use is Gridap, which we load as follows."
+# ╔═╡ 2c10f483-b4ab-45b9-bdcc-36e737ec7a15
+md"After using the `Gridap` package, we define a function `fem_solver`. This function requires as input the number of partitions of the domain and the exact solution of the problem. We consider a uniform mesh (all cells have the same size). Based on the exact solution we want to obtain, we can define the value of the forcing term in the equation and the boundary conditions. This is very common in numerics, the so-called _method of manufactured solutions_. Since we know the exact solution, we can compute errors."
 
-# ╔═╡ fb897110-3b7f-49e1-b2ca-9b72803a0516
-md"We will also use Plots for plotting results."
+# ╔═╡ 43d12cde-a464-4137-ab40-0488cc2f3212
+md"We are considering a Laplacian problem in 1D with Dirichlet boundary conditions on the boundary. The domain is $[0,1]$."
 
-# ╔═╡ bebd4e7e-305e-44ee-98ff-ed0cece19d91
-md"Now, we start defining our problem and its approximation. The corners of the box (end-points in 1D) define the domain. We consider $\Omega \doteq [0.0,1.0]$."
-
-# ╔═╡ 83915d6e-24fa-4dab-99b1-6f53eb1c0588
-Ω = (0.0,1.0)
-
-# ╔═╡ 2fdb6784-2bc4-436d-b16d-28abe456d1e5
-md"Note that `()` does not mean open domain, it means a `Tuple` (collection of values)."
-
-# ╔═╡ ca4d83b2-866d-4094-b6b4-0924e73711d3
-md"Now, we provide a `Tuple` with the number of cells per dimension (1 in 1D) in our mesh. It defines a 1D partition."
-
-# ╔═╡ 41528f87-e212-4db9-a584-77210f783202
-N = (8,)
-
-# ╔═╡ f642f9c9-faf8-4ed3-ad15-f6bdc6d5a169
-md"Now, we can create our partition/mesh as follows. It is a Cartesian model because it is a structured mesh (not much sense in 1D). We will distinguish between Cartesian (structured) and unstructured models in multi-dimension problems. The _model_ is just the mesh/triangulation plus some metadata, like the Dirichlet boundary, etc."
-
-# ╔═╡ 1376d57a-2b1f-4e11-bde7-01a5bc0eb846
-Gₕ = CartesianDiscreteModel(Ω,N)
-
-# ╔═╡ 868c24e4-1124-43cd-afb0-cd80a9a87770
-md"From the complete geometrical model, we can extract the triangulation only."
-
-# ╔═╡ 57c4c9d0-0e92-44c9-a58e-8ac4f399ad9d
-Tₕ = get_triangulation(Gₕ)
-
-# ╔═╡ c4715b96-9b86-4af2-937e-c97fb3594739
-md"We can also pick the order of the finite element space"
-
-# ╔═╡ cf5d990f-af44-4d04-bbce-402cf7f20ce2
-p = 3
-
-# ╔═╡ 4bb02042-79e0-4bdb-a85b-072267698d32
-md"We want to solve a Poisson problem using FEM. Which is the order of the Gauss quadrature we should use to integrate exactly all the terms in our formulation?"
-
-# ╔═╡ 7c08d18e-5cbb-4533-b5fc-ccb12757a7ed
-degree = (p-1)^2
-
-# ╔═╡ 67278dec-447c-4760-83ed-69f68f867a22
-md"Now, we can create the quadrature in `Gridap`. We call _measure_ (the continuous counterpart) to the quadrature for all cells in the mesh."
-
-# ╔═╡ dd199844-2bea-4ae5-bcab-9829733f22f6
-dΩ = Measure(Tₕ,degree)
-
-# ╔═╡ 4ab3df17-12b6-4705-9e7d-5107c89c84b4
-md"Let us consider a problem with analytical solution in strong sense. $\boldsymbol{x}$ is a `Point` in the space. In 1D, do not forget to take its 1st component, `x[1]`! (since $\boldsymbol{x}$ is always a vector, also in 1D)"
-
-# ╔═╡ be786b46-4942-46fd-9256-f4d689441fda
-u(x) = x[1]^2 - 2x[1] + 1
-
-# ╔═╡ 92f89ce9-ad7c-4ed8-8197-f2260bbbb84f
-md"We want $u(\boldsymbol{x})$ to be solution of the Poisson problem. Thus, the forcing term must be (for the Poisson equation):"
-
-# ╔═╡ 96281e84-c3da-48a6-9d1e-260f25dda535
-f(x) = - Δ(u)(x)
-
-# ╔═╡ 197db04a-fae5-48ae-adff-0ed60e3aafc0
-md"We use automatic differentiation in `Gridap` to compute derivatives of functions. For example, Δ computes the Laplacian of the function. You can do it by hand and put the explicit expression for f, but it is more prompt to errors."
-
-# ╔═╡ 806301ea-66ad-4225-8bf9-6fae62b420d4
-md"Now we create a Lagrangian reference finite element of order $p$. `Float64` (floating-point numbers, which represent $\mathbb{R}$ in a computer) means that our unknown is a scalar finite element space for all the information above."
-
-# ╔═╡ f5eace5f-f53d-4001-8d60-317785281d51
-reffe = ReferenceFE(lagrangian,Float64,p)
-
-# ╔═╡ 5e438b9a-392a-4492-8f14-a6400996a461
-md"With this reference finite element, we can create the global finite element space. `boundary` means that we consider Dirichlet data on the whole boundary, i.e., `conformity` being `H1` since we want to use a continuous space."
-
-# ╔═╡ 304081d0-ec22-4bca-9e9f-0caee857a737
-Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
-
-# ╔═╡ 827ff5f3-9ffb-4936-8de7-d97689d5e16a
-md"We see that we have specified _trial_. As we know from the notes, the trial space is always a vector space thus can only have homogeneous Dirichlet boundary conditions. Besides, the _test_ space can have general Dirichlet boundary conditions. Next, we define the test space, and we enforce the functions in this space to be equal to the manufactured solution $u$ define above."
-
-# ╔═╡ 0ae097e7-3ca0-47bf-9454-9dfb20cb128f
-Uₕ = TrialFESpace(Vₕ,u)
-
-# ╔═╡ 503dfa67-c823-4994-8ac0-13f3784c7b17
-md"Now, let us define the bilinear and linear forms in the weak form of the Poisson problem (see the notes for more details). As you can see, the notation is very close to whiteboard maths!"
-
-# ╔═╡ acb3cc08-6a99-4820-9dc1-1215abf98e2b
-begin 
+# ╔═╡ 99fc7002-17d7-11ed-0012-b504f1a83d11
+function finite_element_solver(n,u)
+	f(x) = - Δ(u)(x)
+	Ω = (0.0,1.0)
+	p = 1 # linear elements
+	N = (n,)
+	Gₕ = CartesianDiscreteModel(Ω,N)
+	Tₕ = get_triangulation(Gₕ)
+	degree = (p)^2
+	dΩ = Measure(Tₕ,degree)
+	reffe = ReferenceFE(lagrangian,Float64,p)
+	Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
+	Uₕ = TrialFESpace(Vₕ,u)
 	a(u,v) = ∫(∇(v)⋅∇(u))dΩ
 	l(v) = ∫(v*f)dΩ
+	Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
+	uₕ = solve(Fₕ)
+  e = u - uₕ
+	el2 = sqrt( sum( ∫( e*e )dΩ ) )
+	eh10 = sqrt( sum( a(e,e) ) )
+  return uₕ, el2, eh10
 end
 
-# ╔═╡ e2b22962-bf2c-4103-9c86-065aa528a5b2
-md"Note that we have used `begin ... end`. This is only needed in `Pluto.jl` (this notebook) to put more than one line in the same cell. If you write your code in Julia, you don't need this."
+# ╔═╡ d37bad34-c122-4b4c-a677-aac82636d0ca
+md"Now, we can play with both the number of cells and solution we want to use"
 
-# ╔═╡ e741112d-d363-4168-9b86-42716616b8b6
-md"With these terms, we can now create our algebraic problem (linear system in this case).We define the _operator_ $F(x) = Ax-b$, where $A$ is our matrix and $b$ is the right-hand side. For linear problems (the case here), $F(x)$ thus affine. It takes the terms in the weak form and the trial/test finite element spaces. With this information, we can build $A$ and $b$ internally."
+# ╔═╡ f1ace207-86d6-474c-a7bf-96971f6634bc
+begin
+  n=8
+  u(x) = sin(4*π*x[1])
+  # u(x) = x[1]+1
+end
 
-# ╔═╡ 4a57e0ab-6ae2-47bd-8f67-1ac099736fb6
-Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
+# ╔═╡ 6f2fa46f-19d1-4324-aad5-74197bfc260b
+md"Calling the `finite_element_solver` with these values of $n$ and $u$, we obtain the approximated solution $u_p$ and the $L^2$ and $H^1_0$ errors."
 
-# ╔═╡ c4282586-372d-4fa0-a356-fdf887797926
-md"The solution of our problem is a FE function $u_h$ in Uₕ. The values $u_D$ on the Dirichlet boundary is already known, by construction of Uₕ above. The missing part are the free DOFs of the solution. We note that the offset function method (to impose non-homogenous Dirichlet boundary conditions) is already performed in the construction of $F$ ($A$ and $b$). We know that the free DOFs of $u_h$ is the array of values $u_f$ solution of $F(u_f) = 0$, or alternatively $Au_f = b$. Using `solve` in `Gridap`, we solve the linear system, extract $u_f$, combine it with $u_D$, and get the final FE function solution $u_h$ of our problem."
+# ╔═╡ 444d62c3-2ba8-4b57-9714-0a8ccc22ea82
+uh, el2, eh1 = finite_element_solver(n,u)
 
-# ╔═╡ 7150e0b5-0223-405c-8564-1e330e6b9bd6
-uₕ = solve(Fₕ)
+# ╔═╡ 33620bfc-aed2-47d8-8383-764d0a52d373
+el2
 
-# ╔═╡ 54778273-5b70-4445-a6ec-f1dc1ca9072e
-md"Now, let us check that the solution is correct. We can define the $H^1$ norm and the $L^2$ norm. The error function is:"
+# ╔═╡ 690175ba-d843-4d55-bc77-ec5fc3ed92cf
+eh1
 
-# ╔═╡ 87e257e5-1e66-4d6c-aaf3-1a92b5cfb593
-e = u - uₕ
+# ╔═╡ 909f6d6b-e9c7-45b1-9204-35a2f1b217cf
+md"Now, we want to plot the solutions. After using `Plots`, we can compare the exact and approximated solution."
 
-# ╔═╡ 16168182-1e95-491e-b080-4a159bf6c89e
-md"Now we integrate the value of the square of the norm at each cell and add together for all cells and take the squared root. We can compute the $L^2(\Omega)$ norm."
+# ╔═╡ 08748534-9586-4711-a8d2-256a7c5956d2
+begin
+  uh_x(x) = uh(Point(x))
+  plot(0:(1/(n*10)):1,uh_x)
+  plot!(0:(1/(n*10)):1,u)
+end
 
-# ╔═╡ e637ef04-6c97-44fb-b9a5-c050a7485d8a
-el2 = sqrt( sum( ∫( e*e )dΩ ) )
-
-# ╔═╡ 0f6e0041-4dca-4f2c-92aa-8cb3485d4d5f
-md"The `sum` means that we want to add the norm for all cells in the mesh. In `Gridap`, most quantities are cell-wise, e.g., the result of integrating expressions. We can also compute the $H^1(\Omega)$."
-
-# ╔═╡ 5c854ae7-dfb1-42a7-822d-6da93fc8fee8
-eh1 = sqrt( sum( ∫( e*e + ∇(e)⋅∇(e) )dΩ ) )
-
-# ╔═╡ a2a7a5d8-6f21-410d-8942-681e1955b4b0
-md"We observe that the error is around machine precision, as one expects."
-
-# ╔═╡ 15910f70-271b-4b35-9875-370849cc7621
-md"# Tasks
-
-1. Create a function that, using `Gridap`, solves the Poisson problem in $[0,1]$ for a given order $p$ of the FE space and a given number of elements $N$ in the mesh. The solution $u(x)$ that we want to get using this method will also be an argument of this function. For that, the function will use the method of manufactured solutions. The function must return the $L^2$ and $H^1$ error of the FE solution.
-
-2. Create another function that calls the previous ones for a given order $p$ and different values of $N$ provided in an array, e.g. `[2,4,8,16]`. The function must save the $L^2$ and $H^1$ errors in an array and return them.
-
-Now, consider the method of manufactured solutions with $u(x) = \sin(2\pi x)$.
-
-3. Consider $N=2^i$ for $i=2,\ldots,5$. Plot a log-log function with $x$ axis being $N$ and $y$ axis being the $L^2$ error. Compute the slope using linear regression (check the function that does this in Julia). Idem for $H^1$ error. What can you say about the FE error? How does it change with $N$?
-
-4. Do the same for $p=2, 3, 4$ and $N=8$. What can you say about the FE error? How does it change with $p$?
-
-
-**Very important:** To compute the error, we must integrate a term with a trigonometrical function. Thus, we cannot integrate this term exactly. Consider a better integration than the one above (for polynomials), e.g., four times the degree of the quadrature used above. Otherwise, integration errors in the error norm could pollute the numerical error that we want to observe.
-"
-
+# ╔═╡ 7879f72b-0c5b-492e-ab3c-b786d3961326
+md"Play with the mesh (number of cells). What do you see? Does it make sense? Now,you can try other solutions. E.g., choosing $u = x+1$, which is the expected error? In fact, you can also change the order of approximation. What happens when you increase $p$ for a fixed mesh?"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -172,8 +87,8 @@ Gridap = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
-Gridap = "~0.17.13"
-Plots = "~1.31.3"
+Gridap = "~0.17.14"
+Plots = "~1.31.6"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -190,15 +105,15 @@ uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 version = "1.2.1"
 
 [[deps.AbstractTrees]]
-git-tree-sha1 = "03e0550477d86222521d254b741d470ba17ea0b5"
+git-tree-sha1 = "5c0b629df8a5566a06f5fef5100b53ea56e465a0"
 uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
-version = "0.3.4"
+version = "0.4.2"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "af92965fb30777147966f58acb05da51c5616b5f"
+git-tree-sha1 = "195c5505521008abea5aee4f96930717958eac6f"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-version = "3.3.3"
+version = "3.4.0"
 
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
@@ -210,15 +125,15 @@ uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
 [[deps.ArrayInterfaceCore]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "7d255eb1d2e409335835dc8624c35d97453011eb"
+git-tree-sha1 = "40debc9f72d0511e12d817c7ca06a721b6423ba3"
 uuid = "30b0a656-2188-435a-8636-2ec0e6a096e2"
-version = "0.1.14"
+version = "0.1.17"
 
 [[deps.ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "56c347caf09ad8acb3e261fe75f8e09652b7b05b"
+git-tree-sha1 = "ac5cc6021f32a272ee572dd2a325049a1fa0d034"
 uuid = "4c555306-a7a7-4459-81d9-ec55ddd5c99a"
-version = "0.7.10"
+version = "0.8.11"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -233,9 +148,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[deps.BlockArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "21490270d1fcf2efa9ddb2126d6958e9b72a4db0"
+git-tree-sha1 = "43b09ac794ed8347592dd90539756d1c3416e5f2"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.16.11"
+version = "0.16.19"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -371,9 +286,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
-git-tree-sha1 = "b19534d1895d702889b219c382a6e18010797f0b"
+git-tree-sha1 = "5158c2b41018c5f7eb1470d558127ac274eca0c9"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-version = "0.8.6"
+version = "0.9.1"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
@@ -390,6 +305,11 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "bad72f730e9e91c08d9427d5e8db95478a3c323d"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.4.8+0"
+
+[[deps.Extents]]
+git-tree-sha1 = "5e1e4c53fa39afe63a7d356e30452249365fba99"
+uuid = "411431e0-e8b7-467b-b5e0-f676ba4f2910"
+version = "0.1.1"
 
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
@@ -423,21 +343,21 @@ version = "0.4.9"
 
 [[deps.FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "9267e5f50b0e12fdfd5a2455534345c4cf2c7f7a"
+git-tree-sha1 = "94f5101b96d2d968ace56f7f2db19d0a5f592e28"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.14.0"
+version = "1.15.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
-git-tree-sha1 = "deed294cde3de20ae0b2e0355a6c4e1c6a5ceffc"
+git-tree-sha1 = "246621d23d1f43e3b9c368bf3b72b2331a27c286"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.12.8"
+version = "0.13.2"
 
 [[deps.FiniteDiff]]
 deps = ["ArrayInterfaceCore", "LinearAlgebra", "Requires", "Setfield", "SparseArrays", "StaticArrays"]
-git-tree-sha1 = "cb8c5f0074153ace28ce5100714df4378ad885e0"
+git-tree-sha1 = "5a2cff9b6b77b33b89f3d97a4d367747adce647e"
 uuid = "6a86dc24-6348-571c-b903-95158fe2bd41"
-version = "2.14.0"
+version = "2.15.0"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -459,9 +379,9 @@ version = "0.4.2"
 
 [[deps.ForwardDiff]]
 deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "LogExpFunctions", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "2f18915445b248731ec5db4e4a17e451020bf21e"
+git-tree-sha1 = "187198a4ed8ccd7b5d99c41b69c679269ea2b2d4"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.30"
+version = "0.10.32"
 
 [[deps.FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
@@ -481,9 +401,9 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "51d2dfe8e590fbd74e7a842cf6d13d8a2f45dc01"
+git-tree-sha1 = "d972031d28c8c8d9d7b41a536ad7bb0c2579caca"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.6+0"
+version = "3.3.8+0"
 
 [[deps.GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "RelocatableFolders", "Serialization", "Sockets", "Test", "UUIDs"]
@@ -497,11 +417,17 @@ git-tree-sha1 = "c8ab731c9127cd931c93221f65d6a1008dad7256"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
 version = "0.66.0+0"
 
+[[deps.GeoInterface]]
+deps = ["Extents"]
+git-tree-sha1 = "fb28b5dc239d0174d7297310ef7b84a11804dfab"
+uuid = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+version = "1.0.1"
+
 [[deps.GeometryBasics]]
-deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
-git-tree-sha1 = "83ea630384a13fc4f002b77690bc0afeb4255ac9"
+deps = ["EarCut_jll", "GeoInterface", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
+git-tree-sha1 = "a7a97895780dab1085a97769316aa348830dc991"
 uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
-version = "0.4.2"
+version = "0.4.3"
 
 [[deps.Gettext_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
@@ -523,9 +449,9 @@ version = "1.3.14+0"
 
 [[deps.Gridap]]
 deps = ["AbstractTrees", "BSON", "BlockArrays", "Combinatorics", "DocStringExtensions", "FastGaussQuadrature", "FileIO", "FillArrays", "ForwardDiff", "JLD2", "JSON", "LineSearches", "LinearAlgebra", "NLsolve", "NearestNeighbors", "PolynomialBases", "QuadGK", "Random", "SparseArrays", "SparseMatricesCSR", "StaticArrays", "Test", "WriteVTK"]
-git-tree-sha1 = "74435be39017d49f0a0aefd5a0f74b75bd05c846"
+git-tree-sha1 = "e66749aba5b8d2e41155c2b12dea9bc7c2a71440"
 uuid = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
-version = "0.17.13"
+version = "0.17.14"
 
 [[deps.Grisu]]
 git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
@@ -629,9 +555,9 @@ version = "1.3.0"
 
 [[deps.Latexify]]
 deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "Printf", "Requires"]
-git-tree-sha1 = "46a39b9c58749eefb5f2dc1178cb8fab5332b1ab"
+git-tree-sha1 = "1a43be956d433b5d0321197150c2f94e16c0aaa0"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.15.15"
+version = "0.15.16"
 
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
@@ -722,9 +648,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "09e4b894ce6a976c354a69041a04748180d43637"
+git-tree-sha1 = "361c2b088575b07946508f135ac556751240091c"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.15"
+version = "0.3.17"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -753,9 +679,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "Random", "Sockets"]
-git-tree-sha1 = "9f4f5a42de3300439cb8300236925670f844a555"
+git-tree-sha1 = "d9ab10da9de748859a7780338e1d6566993d1f25"
 uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "1.1.1"
+version = "1.1.3"
 
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -882,10 +808,10 @@ uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.3.0"
 
 [[deps.Plots]]
-deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "Unzip"]
-git-tree-sha1 = "5a1e85f3aed2e0d3d99a4068037c8582597b89cf"
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "Unzip"]
+git-tree-sha1 = "79830c17fe30f234931767238c584b3a75b3329d"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.31.3"
+version = "1.31.6"
 
 [[deps.PolynomialBases]]
 deps = ["ArgCheck", "FFTW", "FastGaussQuadrature", "LinearAlgebra", "Requires", "SpecialFunctions", "UnPack"]
@@ -930,9 +856,9 @@ version = "1.2.1"
 
 [[deps.RecipesPipeline]]
 deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
-git-tree-sha1 = "2690681814016887462cf5ac37102b51cd9ec781"
+git-tree-sha1 = "e7eac76a958f8664f2718508435d058168c7953d"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
-version = "0.6.2"
+version = "0.6.3"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -964,10 +890,10 @@ version = "1.1.1"
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [[deps.Setfield]]
-deps = ["ConstructionBase", "Future", "MacroTools", "Requires"]
-git-tree-sha1 = "77172cadd2fdfa0c84c87e3a01215a4ca7723310"
+deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
+git-tree-sha1 = "e5364b687e552d73543cf09e583b944eaffff6c4"
 uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -1007,9 +933,9 @@ version = "2.1.7"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
-git-tree-sha1 = "e972716025466461a3dc1588d9168334b71aafff"
+git-tree-sha1 = "23368a3313d12a2326ad0035f0db0c0966f438ef"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.5.1"
+version = "1.5.2"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "66fe9eb253f910fe8cf161953880cfdaef01cdf0"
@@ -1022,15 +948,15 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "2c11d7290036fe7aac9038ff312d3b3a2a5bf89e"
+git-tree-sha1 = "f9af7f195fb13589dd2e2d57fdb401717d2eb1f6"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.4.0"
+version = "1.5.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
+git-tree-sha1 = "d1bf48bfcc554a3761a133fe3a9bb01488e06916"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.19"
+version = "0.33.21"
 
 [[deps.StructArrays]]
 deps = ["Adapt", "DataAPI", "StaticArrays", "Tables"]
@@ -1328,56 +1254,27 @@ version = "3.5.0+0"
 
 [[deps.xkbcommon_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll", "Wayland_protocols_jll", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]
-git-tree-sha1 = "ece2350174195bb31de1a63bea3a41ae1aa593b6"
+git-tree-sha1 = "9ebfc140cc56e8c2156a15ceac2f0302e327ac0a"
 uuid = "d8fb68d0-12a3-5cfd-a85a-d49703b185fd"
-version = "0.9.1+5"
+version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─26f700b4-0958-11ed-0249-83548500e23c
-# ╠═92080451-a4ee-471e-a7b9-d26702ec802e
-# ╟─fb897110-3b7f-49e1-b2ca-9b72803a0516
-# ╠═343828e3-018b-4155-b860-2e4733d57fee
-# ╟─bebd4e7e-305e-44ee-98ff-ed0cece19d91
-# ╠═83915d6e-24fa-4dab-99b1-6f53eb1c0588
-# ╟─2fdb6784-2bc4-436d-b16d-28abe456d1e5
-# ╟─ca4d83b2-866d-4094-b6b4-0924e73711d3
-# ╠═41528f87-e212-4db9-a584-77210f783202
-# ╟─f642f9c9-faf8-4ed3-ad15-f6bdc6d5a169
-# ╠═1376d57a-2b1f-4e11-bde7-01a5bc0eb846
-# ╟─868c24e4-1124-43cd-afb0-cd80a9a87770
-# ╠═57c4c9d0-0e92-44c9-a58e-8ac4f399ad9d
-# ╟─c4715b96-9b86-4af2-937e-c97fb3594739
-# ╠═cf5d990f-af44-4d04-bbce-402cf7f20ce2
-# ╟─4bb02042-79e0-4bdb-a85b-072267698d32
-# ╠═7c08d18e-5cbb-4533-b5fc-ccb12757a7ed
-# ╟─67278dec-447c-4760-83ed-69f68f867a22
-# ╠═dd199844-2bea-4ae5-bcab-9829733f22f6
-# ╟─4ab3df17-12b6-4705-9e7d-5107c89c84b4
-# ╠═be786b46-4942-46fd-9256-f4d689441fda
-# ╟─92f89ce9-ad7c-4ed8-8197-f2260bbbb84f
-# ╠═96281e84-c3da-48a6-9d1e-260f25dda535
-# ╟─197db04a-fae5-48ae-adff-0ed60e3aafc0
-# ╟─806301ea-66ad-4225-8bf9-6fae62b420d4
-# ╠═f5eace5f-f53d-4001-8d60-317785281d51
-# ╟─5e438b9a-392a-4492-8f14-a6400996a461
-# ╠═304081d0-ec22-4bca-9e9f-0caee857a737
-# ╟─827ff5f3-9ffb-4936-8de7-d97689d5e16a
-# ╠═0ae097e7-3ca0-47bf-9454-9dfb20cb128f
-# ╟─503dfa67-c823-4994-8ac0-13f3784c7b17
-# ╠═acb3cc08-6a99-4820-9dc1-1215abf98e2b
-# ╟─e2b22962-bf2c-4103-9c86-065aa528a5b2
-# ╟─e741112d-d363-4168-9b86-42716616b8b6
-# ╠═4a57e0ab-6ae2-47bd-8f67-1ac099736fb6
-# ╟─c4282586-372d-4fa0-a356-fdf887797926
-# ╠═7150e0b5-0223-405c-8564-1e330e6b9bd6
-# ╟─54778273-5b70-4445-a6ec-f1dc1ca9072e
-# ╠═87e257e5-1e66-4d6c-aaf3-1a92b5cfb593
-# ╟─16168182-1e95-491e-b080-4a159bf6c89e
-# ╠═e637ef04-6c97-44fb-b9a5-c050a7485d8a
-# ╟─0f6e0041-4dca-4f2c-92aa-8cb3485d4d5f
-# ╠═5c854ae7-dfb1-42a7-822d-6da93fc8fee8
-# ╟─a2a7a5d8-6f21-410d-8942-681e1955b4b0
-# ╟─15910f70-271b-4b35-9875-370849cc7621
+# ╠═0290f466-864c-4a26-8c0d-1df7cf0ff665
+# ╟─a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
+# ╠═b102d193-0900-4e57-a83c-cb9198012618
+# ╟─2c10f483-b4ab-45b9-bdcc-36e737ec7a15
+# ╟─43d12cde-a464-4137-ab40-0488cc2f3212
+# ╠═99fc7002-17d7-11ed-0012-b504f1a83d11
+# ╟─d37bad34-c122-4b4c-a677-aac82636d0ca
+# ╠═f1ace207-86d6-474c-a7bf-96971f6634bc
+# ╟─6f2fa46f-19d1-4324-aad5-74197bfc260b
+# ╠═444d62c3-2ba8-4b57-9714-0a8ccc22ea82
+# ╠═33620bfc-aed2-47d8-8383-764d0a52d373
+# ╠═690175ba-d843-4d55-bc77-ec5fc3ed92cf
+# ╟─909f6d6b-e9c7-45b1-9204-35a2f1b217cf
+# ╠═2b1910b1-9629-4c0d-ba2d-289cf03d42c9
+# ╠═08748534-9586-4711-a8d2-256a7c5956d2
+# ╟─7879f72b-0c5b-492e-ab3c-b786d3961326
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
