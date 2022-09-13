@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -34,7 +34,10 @@ function finite_element_solver(n,_b)
   reffe = ReferenceFE(lagrangian,Float64,p)
   Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
   Uₕ = TrialFESpace(Vₕ,u)
-  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ
+  h = 1/n
+  # Uncomment to add stabilisation
+  τ = h/_b
+  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ + ∫(τ*(b⋅∇(v))*(b⋅∇(u)))dΩ
   l(v) = ∫(v*f)dΩ
   Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
   uh = uₕ = solve(Fₕ)
@@ -54,7 +57,7 @@ end
 println("Peclet number is ",(b/n))
 
 # ╔═╡ 6f2fa46f-19d1-4324-aad5-74197bfc260b
-md"Let us play with these two parameters (and see what happens."
+md"Let us play with these two parameters (and see what happens. We can also activate the stabilisation and see how the situation improves"
 
 # ╔═╡ 444d62c3-2ba8-4b57-9714-0a8ccc22ea82
 uh = finite_element_solver(n,b)
@@ -1277,16 +1280,16 @@ version = "1.4.1+0"
 # ╟─0290f466-864c-4a26-8c0d-1df7cf0ff665
 # ╟─a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
 # ╠═b102d193-0900-4e57-a83c-cb9198012618
-# ╠═2c10f483-b4ab-45b9-bdcc-36e737ec7a15
+# ╟─2c10f483-b4ab-45b9-bdcc-36e737ec7a15
 # ╠═99fc7002-17d7-11ed-0012-b504f1a83d11
-# ╠═d37bad34-c122-4b4c-a677-aac82636d0ca
+# ╟─d37bad34-c122-4b4c-a677-aac82636d0ca
 # ╠═f1ace207-86d6-474c-a7bf-96971f6634bc
 # ╟─a1872f09-76e7-4ebf-9052-d52958998e7d
 # ╠═6f2fa46f-19d1-4324-aad5-74197bfc260b
 # ╠═444d62c3-2ba8-4b57-9714-0a8ccc22ea82
 # ╠═2b1910b1-9629-4c0d-ba2d-289cf03d42c9
 # ╠═08748534-9586-4711-a8d2-256a7c5956d2
-# ╠═7879f72b-0c5b-492e-ab3c-b786d3961326
+# ╟─7879f72b-0c5b-492e-ab3c-b786d3961326
 # ╠═4c41be46-a1e3-461b-b7ad-6a9636f629e6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
