@@ -37,7 +37,7 @@ function finite_element_solver(n,_b)
   h = 1/n
   # Uncomment to add stabilisation
   τ = h/_b
-  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ + ∫(τ*(b⋅∇(v))*(b⋅∇(u)))dΩ
+  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ #+ ∫(τ*(b⋅∇(v))*(b⋅∇(u)))dΩ
   l(v) = ∫(v*f)dΩ
   Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
   uh = uₕ = solve(Fₕ)
@@ -49,8 +49,8 @@ md"Now, we can play with both the number of cells and convection. Changing these
 
 # ╔═╡ f1ace207-86d6-474c-a7bf-96971f6634bc
 begin
-  n=10
-  b =40.0
+  n=80
+  b =20.0
 end
 
 # ╔═╡ a1872f09-76e7-4ebf-9052-d52958998e7d
