@@ -31,6 +31,7 @@ function compute_solution(N,order,u)
 
   degree = (order-1)*2
   dΩ = Measure(trian,degree)
+  dΩ_super = Measure(trian,degree*4)
 
   reffe = ReferenceFE(lagrangian,Float64,order)
 
@@ -42,7 +43,7 @@ function compute_solution(N,order,u)
   U = TrialFESpace(V,u)
 
   a(u,v) = ∫( ∇(v)⋅∇(u) )dΩ
-  l(v) = ∫( v*f )dΩ
+  l(v) = ∫( v*f )dΩ_super
 
   op = AffineFEOperator(a,l,U,V)
 
@@ -53,7 +54,7 @@ function compute_solution(N,order,u)
 
   e = u - uh
 
-  dΩ_super = Measure(trian,degree*4)
+
   eh1 = sqrt(sum( ∫( e*e + ∇(e)⋅∇(e) )*dΩ_super ))
 
   return uh, eh1
@@ -126,7 +127,7 @@ md"We start running the `hp_refinement` function above for the specified values.
 begin
 	u_1(x) = sin(2*π*x[1])
 	ps_1 = collect(1:4)
-	ncells_1 = [ 2^i for i in 2:4 ]
+	ncells_1 = [ 2^i for i in 2:5 ]
 	eh1_1, ndofs_1, uhs_1 = hp_refinement(u_1,ps_1,ncells_1)
 end
 
@@ -183,15 +184,13 @@ md"# Test 2
  using a log-log plot. We consider the domain $(0,1)$. The difference with respect
  to the previous test is the analytical solution we want. We have defined
  the function as a piecewise function in $C^1([0,1])$ but not in
- $C^2([0,1])$. The function is not in $H^2((0,1))$.
+ $C^2([0,1])$. The function is only $H^2((0,1))$.
 
  We compute the slope of the log-log plot using a linear regression.
 
- **Exercise 2.1:** Consider different orders, e.g., $p=1,2,3,4,5$. What do you
- think about the numerical slope? Is it what we should expect from theory?
-
- **Exercise 2.2:** Run the same code for meshes with  $N = 3^i$ for $i=3,\ldots,6$ cells.
- What happens with the error? How can you explain it?
+ **Exercise 2.1:** Consider h-refinement with meshes with  $N = 3^i$ for $i=3,\ldots,6$ cells,
+ for different orders $p=1,2,3,4,5$.
+  What happens with the convergence order of the error? How can you explain it?
 "
 
 # ╔═╡ 286c995e-d91e-4077-9818-3d5080099adc
@@ -212,9 +211,6 @@ slope_2 = compute_slope(ndofs_2,eh1_2,log10,log10)
 
 # ╔═╡ 0af1d193-29ed-4126-8e70-4ac68317db08
 md"*Answer:* _Please provide your answer to the exercise 2.1 here_"
-
-# ╔═╡ 66980f39-2751-4189-92ce-f9b5b073f21e
-md"*Answer:* _Please provide your answer to the exercise 2.2 here_"
 
 # ╔═╡ a58e2650-d7cf-4f2f-8279-66819a141541
 md"# Test 3
@@ -1547,7 +1543,7 @@ version = "1.4.1+0"
 # ╟─0c3ddb84-495d-46ab-a299-8b6fdeb3d951
 # ╠═ff7d4017-3a12-4d58-8705-e68252feb817
 # ╟─11e00a96-14c3-4f4a-bb8f-c857f331b6a1
-# ╠═19118399-f016-4aa7-b6a7-a15b352b23be
+# ╟─19118399-f016-4aa7-b6a7-a15b352b23be
 # ╠═cc823a67-3092-4f09-8d7a-cd133630f471
 # ╟─886194fa-442f-4db6-8152-d92b970d5c2e
 # ╟─7427dae3-8ae8-417b-8126-74490bd6ddc4
@@ -1560,13 +1556,12 @@ version = "1.4.1+0"
 # ╟─92bf3e21-7351-427c-9c95-5f424aa11149
 # ╠═24a4d8ef-4b0a-4c1b-be5d-55e0a1db7490
 # ╠═fc6d6cc2-d7ec-4b50-a554-91bfe1a2e960
-# ╠═0ff1e8f7-3631-42bc-ba44-8a36acc3987d
+# ╟─0ff1e8f7-3631-42bc-ba44-8a36acc3987d
 # ╠═286c995e-d91e-4077-9818-3d5080099adc
 # ╠═137bb477-9c16-427b-acf8-b1c2eb0fe85e
 # ╠═bed6e374-76e1-4018-ac58-92c7d3cf7c12
 # ╠═548aa91f-3524-4dff-8ea9-085d2b4dff3d
 # ╠═0af1d193-29ed-4126-8e70-4ac68317db08
-# ╠═66980f39-2751-4189-92ce-f9b5b073f21e
 # ╟─a58e2650-d7cf-4f2f-8279-66819a141541
 # ╟─0f222b94-3f12-4b6a-85cd-fa0d4e49778b
 # ╠═0f4ca362-075a-45b8-94e0-0186550ad8fc
