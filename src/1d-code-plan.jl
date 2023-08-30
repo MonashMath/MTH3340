@@ -4,31 +4,43 @@
 
 # Which structs do we need?
 
-# Mesh representation
+# 1. Mesh representation
+
+# Compute the mesh for a domain (a,b), N cells, uniform 1d mesh constructor
 
 struct Mesh
-   nodes_coordinates
-   cell_nodes
+   nodes_coordinates # Returns the nodes coordinates for a given cell
+   cell_nodes        # Returns the nodes global Id for a given cell
 end
 
-# domain (a,b), N cells, uniform 1d mesh constructor
-
 function Mesh(a,b,N)
-  ...
+  # here the code that computes the mesh
   return Mesh(nodes_coordinates,cell_nodes)
 end
 
-get_cell_nodes = ...
-get_node_coordinates = ...
+
+# Here, you could create methods (API) like 
+# get_nodes_coordinates(::mesh) 
+# get_cell_nodes(::mesh)
+# but not strictly required (even though good practise)
+
+get_cell_nodes #...
+get_node_coordinates #...
 
 # Quadrature (in the reference cell)
+# you can build the Quadrature using Julia package for Gauss quadrature 
+# e.g., FastGaussQuadratures
 
 struct Quadrature
   points
   weights
 end
 
-# you can build the Quadrature using Julia package for Gauss quadrature 
+# and create a (trivial) API
+
+get_integration_points #...
+get_weights #...
+
 
 function Quadrature(degree)
   # determine points needed given a quadrature
@@ -38,10 +50,16 @@ end
 
 # RefFE 
 
+# Create a 1D reference FE space in [-1,1] for an arbitrary order p
+
 struct RefFE
   shape_functions::Vector{Function}
   gradient_shape_functions::Vector{Function}
 end
+
+# Here you have two options. 1) Use Lagrangian polynomials or 
+# 2) a change of basis and a monomial prebasis.
+# 1) is easier in this case, but not as general as 2).
 
 # Create RefFE constructor for order p
 
@@ -52,24 +70,38 @@ end
 
 # Geometrical map 
 
+# Here, you will create the geometrical map, which is a cell-wise polynomial.
+# It maps your cell I [x_i,x_i+1] onto [-1,1] using a linear polynomial.
+# It can readily be defined using scalar first order shape functions from a
+# reference FE just constructed (see the lecture notes).
+
 struct GeoMap
   mesh::Mesh
   ref_febasis::RefFE
 end
-
-# Geometrical map from reference to physical cell
 
 function GeoMap(mesh::Mesh)
   # Use a linear RefFE to describe the geomap (see lecture notes)
 end
 
 function get_cell_jacobian(gm::geomap)
-  # Combine the mesh coordinates with gradient shape functions
-  # Do this for each cell in the mesh
-  # return a cell array
+  # Combine the mesh coordinates with the gradient shape functions
+  # Do this for each cell in the mesh and
+  # return a cell array with the Jacobians
 end
 
 # FE Space 
+
+# This struct starts getting a little bit complicated. As we know,
+# the global FE space requires the mesh, the reference FE, a 
+# local-to-global index map for assembly, and it also needs to know
+# whether a node is fixed or free.
+
+# In this work, we assume that the whole boundary, i.e., x = a and b,
+# is of Dirichlet type. In order to distinguish between free and fixed
+# dofs, we can use the following. We enumerate fixed nodes with 
+# -1, -2, ... and free dofs with 1, 2, ... Store this local-to-global
+# map (for both free and fixed dofs), in a vector.
 
 struct FESpace 
   mesh::Mesh
