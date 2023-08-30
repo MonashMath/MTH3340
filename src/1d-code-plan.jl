@@ -101,15 +101,18 @@ end
 # is of Dirichlet type. In order to distinguish between free and fixed
 # dofs, we can use the following. We enumerate fixed nodes with 
 # -1, -2, ... and free dofs with 1, 2, ... Store this local-to-global
-# map (for both free and fixed dofs), in a vector.
+# map (for both free and fixed dofs), in a vector. At each cell, you can
+# extract the nodes (from the mesh), and access that vector in the 
+# corresponding positions to get the local-global index at the cell
+# level. You can alternatively just create the cell-wise local-global
+# vector of vectors.
+# For the fixed nodes, you have to store the values to be fixed.
 
 struct FESpace 
   mesh::Mesh
   reffe::RefFE
   fixed_values # e.g, a vector with values at the Dirichlet nodes 
-  cell_dofs
 end
-
 
 function FESpace(mesh,reffe,uD) # uD is a function such that uD(a) = ua, uD(b) = ub
   # extract the boundary nodes and evaluate uD in this nodes to get the fixed_values
