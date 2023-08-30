@@ -114,12 +114,10 @@ struct FESpace
   fixed_values # e.g, a vector with values at the Dirichlet nodes 
 end
 
-function FESpace(mesh,reffe,uD) # uD is a function such that uD(a) = ua, uD(b) = ub
+function FESpace(mesh,reffe,uD) 
+   # uD is a function such that uD(a) = ua, uD(b) = ub
   # extract the boundary nodes and evaluate uD in this nodes to get the fixed_values
   # create the local to global Dof map (see lecture notes) 
-  # To deal with Dirichlet nodes, we usually put negative indices for nodes that are Dirichlet
-  # and positive index for those that are free, this way, we can check whether a node is Dirichlet
-  # or not in the loop below.
   # use the default constructor
 end
 
