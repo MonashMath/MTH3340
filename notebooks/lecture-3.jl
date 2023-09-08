@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.27
+# v0.17.7
 
 using Markdown
 using InteractiveUtils
@@ -18,6 +18,52 @@ md"Below, we are defining a finite element method solver for convection-difussio
 
 # ╔═╡ 2c10f483-b4ab-45b9-bdcc-36e737ec7a15
 md"We define a function `finite_element_solver` that solves the convection-difussion equation in $[0,1]$ for a given number of parts and convection velocity. We enforce the solution to be 0 at $x=0$ and 1 at $x=1$. We consider a uniform mesh (all cells have the same size)."
+
+# ╔═╡ 99fc7002-17d7-11ed-0012-b504f1a83d11
+function finite_element_solver(n,_b)
+  b = VectorValue(_b,)
+  u(x) = x[1]
+  f(x) = 0.0 #- Δ(u)(x)
+  Ω = (0.0,1.0)
+  p = 1 # linear elements
+  N = (n,)
+  Gₕ = CartesianDiscreteModel(Ω,N)
+  Tₕ = get_triangulation(Gₕ)
+  degree = (p)^2
+  dΩ = Measure(Tₕ,degree)
+  reffe = ReferenceFE(lagrangian,Float64,p)
+  Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
+  Uₕ = TrialFESpace(Vₕ,u)
+  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ
+  l(v) = ∫(v*f)dΩ
+  Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
+  uh = uₕ = solve(Fₕ)
+  return uₕ #, el2, eh10
+end
+
+# ╔═╡ 3dd1a753-a415-4089-88d7-b08a8047a62b
+function finite_element_AD_solver(n,_b)
+  b = VectorValue(_b,)
+  u(x) = x[1]
+  f(x) = 0.0 #- Δ(u)(x)
+  Ω = (0.0,1.0)
+  p = 1 # linear elements
+  N = (n,)
+  Gₕ = CartesianDiscreteModel(Ω,N)
+  Tₕ = get_triangulation(Gₕ)
+  degree = (p)^2
+  dΩ = Measure(Tₕ,degree)
+  reffe = ReferenceFE(lagrangian,Float64,p)
+  Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
+  Uₕ = TrialFESpace(Vₕ,u)
+  h = 1/n
+  μAD = norm(_b)*h
+  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫((1+μAD)*∇(v)⋅∇(u))dΩ
+  l(v) = ∫(v*f)dΩ
+  Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
+  uh = uₕ = solve(Fₕ)
+  return uₕ #, el2, eh10
+end
 
 # ╔═╡ 6f9c09fe-125c-4b53-9b7a-0792b907b04b
 function finite_element_supg_solver(n,_b)
@@ -43,39 +89,20 @@ function finite_element_supg_solver(n,_b)
   return uₕ #, el2, eh10
 end
 
-# ╔═╡ 99fc7002-17d7-11ed-0012-b504f1a83d11
-function finite_element_solver(n,_b)
-  b = VectorValue(_b,)
-  u(x) = x[1]
-  f(x) = 0.0 #- Δ(u)(x)
-  Ω = (0.0,1.0)
-  p = 1 # linear elements
-  N = (n,)
-  Gₕ = CartesianDiscreteModel(Ω,N)
-  Tₕ = get_triangulation(Gₕ)
-  degree = (p)^2
-  dΩ = Measure(Tₕ,degree)
-  reffe = ReferenceFE(lagrangian,Float64,p)
-  Vₕ = TestFESpace(Gₕ,reffe; conformity=:H1, dirichlet_tags="boundary")
-  Uₕ = TrialFESpace(Vₕ,u)
-  a(u,v) = ∫(v*(b⋅∇(u)))dΩ + ∫(∇(v)⋅∇(u))dΩ
-  l(v) = ∫(v*f)dΩ
-  Fₕ = AffineFEOperator(a,l,Uₕ,Vₕ)
-  uh = uₕ = solve(Fₕ)
-  return uₕ #, el2, eh10
-end
-
 # ╔═╡ d37bad34-c122-4b4c-a677-aac82636d0ca
 md"Now, we can play with both the number of cells and convection. Changing these parameters, we can modify the so-called Pe number, which is the ratio between the convective velocity and the mesh size."
 
 # ╔═╡ f1ace207-86d6-474c-a7bf-96971f6634bc
 begin
-  n=10
-  b =1000.0
+  n=1000
+  b =100.0
 end
 
 # ╔═╡ a1872f09-76e7-4ebf-9052-d52958998e7d
-println("Peclet number is ",(b/n))
+println("Peclet number is ",(b/n)) # |b|h/μ
+
+# ╔═╡ 974bd5e1-c8fb-4633-9925-5470ae255494
+b/n
 
 # ╔═╡ 6f2fa46f-19d1-4324-aad5-74197bfc260b
 md"Let us play with these two parameters (and see what happens."
@@ -86,17 +113,8 @@ uh = finite_element_solver(n,b)
 # ╔═╡ 6fefb4a2-18ba-489a-8b30-c61abdf5f222
 uh_supg = finite_element_supg_solver(n,b)
 
-# ╔═╡ 7879f72b-0c5b-492e-ab3c-b786d3961326
-md"What do you see? As we increase the Pe number above 1, we start seeing wiggles. The finite element method is not accurate in this regime. One can always reduce the mesh size to make the method work again, but it can be very costly (think about highly turbulent flows surrounding an airplane). There are ways to fix this behavior, as we will see."
-
-# ╔═╡ 4c41be46-a1e3-461b-b7ad-6a9636f629e6
-println("Peclet number is ",(b/n))
-
-# ╔═╡ a16fd78f-f3ee-4799-8c45-b05e1fd0fe58
-begin
-  uh_x(x) = uh_supg(Point(x))
-  plot(0:(1/(n*10)):1,uh_x)
-end
+# ╔═╡ 1499a4ca-d0e4-4de8-8d38-3c42a8972a09
+uh_AD = finite_element_AD_solver(n,b)
 
 # ╔═╡ 08748534-9586-4711-a8d2-256a7c5956d2
 begin
@@ -104,6 +122,27 @@ begin
   plot(0:(1/(n*10)):1,uh_x)
 end
 
+
+# ╔═╡ a16fd78f-f3ee-4799-8c45-b05e1fd0fe58
+begin
+  uh_x_supg(x) = uh_supg(Point(x))
+  plot(0:(1/(n*10)):1,uh_x_supg)
+  uh_x_AD(x) = uh_AD(Point(x))
+  plot!(0:(1/(n*10)):1,uh_x_AD)
+end
+
+# ╔═╡ 7879f72b-0c5b-492e-ab3c-b786d3961326
+md"What do you see? As we increase the Pe number above 1, we start seeing wiggles. The finite element method is not accurate in this regime. One can always reduce the mesh size to make the method work again, but it can be very costly (think about highly turbulent flows surrounding an airplane). There are ways to fix this behavior, as we will see."
+
+# ╔═╡ 4c41be46-a1e3-461b-b7ad-6a9636f629e6
+println("Peclet number is ",(b/n))
+
+# ╔═╡ 5f594994-4798-4f8c-a1f7-a1706b606f9d
+md"You can do some things to learn more about this topic:
+* Create a solver for streamline diffusion and see what you get
+* Check the convergence rate of these methods for different Pe
+* Think about how SUPG (consistent) and AD/SD (non-consistent) compare when Pe increases. Can you explain this?
+"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1316,19 +1355,23 @@ version = "1.4.1+0"
 # ╟─0290f466-864c-4a26-8c0d-1df7cf0ff665
 # ╟─a4e0c8ad-fbe2-4f7f-aaff-3ba79ee05c08
 # ╠═b102d193-0900-4e57-a83c-cb9198012618
-# ╟─2c10f483-b4ab-45b9-bdcc-36e737ec7a15
-# ╟─6f9c09fe-125c-4b53-9b7a-0792b907b04b
-# ╟─99fc7002-17d7-11ed-0012-b504f1a83d11
+# ╠═2c10f483-b4ab-45b9-bdcc-36e737ec7a15
+# ╠═99fc7002-17d7-11ed-0012-b504f1a83d11
+# ╠═3dd1a753-a415-4089-88d7-b08a8047a62b
+# ╠═6f9c09fe-125c-4b53-9b7a-0792b907b04b
 # ╟─d37bad34-c122-4b4c-a677-aac82636d0ca
 # ╠═f1ace207-86d6-474c-a7bf-96971f6634bc
-# ╟─a1872f09-76e7-4ebf-9052-d52958998e7d
+# ╠═a1872f09-76e7-4ebf-9052-d52958998e7d
+# ╠═974bd5e1-c8fb-4633-9925-5470ae255494
 # ╟─6f2fa46f-19d1-4324-aad5-74197bfc260b
-# ╟─444d62c3-2ba8-4b57-9714-0a8ccc22ea82
-# ╟─6fefb4a2-18ba-489a-8b30-c61abdf5f222
+# ╠═444d62c3-2ba8-4b57-9714-0a8ccc22ea82
+# ╠═6fefb4a2-18ba-489a-8b30-c61abdf5f222
+# ╠═1499a4ca-d0e4-4de8-8d38-3c42a8972a09
 # ╟─2b1910b1-9629-4c0d-ba2d-289cf03d42c9
 # ╠═08748534-9586-4711-a8d2-256a7c5956d2
 # ╠═a16fd78f-f3ee-4799-8c45-b05e1fd0fe58
 # ╠═7879f72b-0c5b-492e-ab3c-b786d3961326
 # ╠═4c41be46-a1e3-461b-b7ad-6a9636f629e6
+# ╟─5f594994-4798-4f8c-a1f7-a1706b606f9d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
