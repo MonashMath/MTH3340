@@ -116,6 +116,7 @@ end
 struct FESpace 
   mesh::Mesh
   reffe::RefFE
+  node_map::Array # local to global map
   fixed_values # e.g, a vector with values at the Dirichlet nodes 
 end
 
