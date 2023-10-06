@@ -76,18 +76,23 @@ end
 # reference FE just constructed (see the lecture notes).
 
 struct GeoMap
-  mesh::Mesh
-  ref_febasis::RefFE
+  maps::Array{Function}
+  jacobian::Array{Function}
 end
 
 function GeoMap(mesh::Mesh)
   # Use a linear RefFE to describe the geomap (see lecture notes)
+
+  # Combine the mesh coordinates with the shape functions (map)
+   
+  # Combine the mesh coordinates with the gradient shape functions (Jacobian)
+   
+  # Do this for each cell in the mesh and
+  # return a cell array with the maps and Jacobians
 end
 
 function get_cell_jacobian(gm::geomap)
-  # Combine the mesh coordinates with the gradient shape functions
-  # Do this for each cell in the mesh and
-  # return a cell array with the Jacobians
+   return geomap.jacobian
 end
 
 # FE Space 
@@ -111,6 +116,7 @@ end
 struct FESpace 
   mesh::Mesh
   reffe::RefFE
+  node_map::Array # local to global map
   fixed_values # e.g, a vector with values at the Dirichlet nodes 
 end
 
