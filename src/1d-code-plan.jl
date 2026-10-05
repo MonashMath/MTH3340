@@ -19,13 +19,16 @@ function Mesh(a,b,N)
 end
 
 
-# Here, you could create methods (API) like 
-# get_nodes_coordinates(::mesh) 
-# get_cell_nodes(::mesh)
-# but not strictly required (even though good practise)
+# Here, you could create methods (API) like
+# get_node_coordinates(::Mesh)
+# get_cell_nodes(::Mesh)
+# num_cells(::Mesh)
+# but not strictly required (even though good practise). The idea is that
+# the rest of the code only uses these methods, never the fields.
 
-get_cell_nodes #...
-get_node_coordinates #...
+get_node_coordinates(m::Mesh) = m.nodes_coordinates
+get_cell_nodes(m::Mesh) = m.cell_nodes
+num_cells(m::Mesh) = length(m.cell_nodes)
 
 # Quadrature (in the reference cell)
 # you can build the Quadrature using Julia package for Gauss quadrature 
@@ -38,8 +41,9 @@ end
 
 # and create a (trivial) API
 
-get_integration_points #...
-get_weights #...
+get_integration_points(q::Quadrature) = q.points
+get_weights(q::Quadrature) = q.weights
+num_points(q::Quadrature) = length(q.points)
 
 
 function Quadrature(degree)
@@ -57,9 +61,14 @@ struct RefFE
   gradient_shape_functions::Vector{Function}
 end
 
-# Here you have two options. 1) Use Lagrangian polynomials or 
+# Here you have two options. 1) Use Lagrangian polynomials or
 # 2) a change of basis and a monomial prebasis.
-# 1) is easier in this case, but not as general as 2).
+# 1) is easier in this case, but not as general as 2). We use 1):
+# with nodes x_1 = -1 < ... < x_{p+1} = 1 (equispaced),
+#   phi_i(x)  = prod_{j != i} (x - x_j)/(x_i - x_j)
+#   phi_i'(x) = sum_{k != i} 1/(x_i - x_k) prod_{j != i,k} (x - x_j)/(x_i - x_j)
+# Both fields are vectors of functions (a function can return a function:
+# lagrange(i) = x -> ... gives the i-th shape function).
 
 # Create RefFE constructor for order p
 
@@ -68,32 +77,41 @@ function RefFE(p)
   # call default constructor
 end
 
+# API
+get_shape_functions(r::RefFE) = r.shape_functions
+get_gradient_shape_functions(r::RefFE) = r.gradient_shape_functions
+num_dofs(r::RefFE) = length(r.shape_functions)
+
 # Geometrical map 
 
 # Here, you will create the geometrical map, which is a cell-wise polynomial.
-# It maps your cell I [x_i,x_i+1] onto [-1,1] using a linear polynomial.
+# It maps [-1,1] onto your cell K = [x[i], x[i+1]] using a linear polynomial.
 # It can readily be defined using scalar first order shape functions from a
-# reference FE just constructed (see the lecture notes).
+# reference FE just constructed (see the lecture notes):
+#   Phi_K(xhat) = sum_i x_K^i phi_i(xhat),   J_K(xhat) = sum_i x_K^i phi_i'(xhat)
+# Again two vectors of functions, one entry per cell: maps[K] is the linear
+# combination of the two linear shape functions with the vertex coordinates
+# of K as coefficients (idem the Jacobian with the derivatives).
 
 struct GeoMap
-  maps::Array{Function}
-  jacobian::Array{Function}
+  maps::Vector{Function}
+  jacobian::Vector{Function}
 end
 
 function GeoMap(mesh::Mesh)
   # Use a linear RefFE to describe the geomap (see lecture notes)
 
   # Combine the mesh coordinates with the shape functions (map)
-   
+
   # Combine the mesh coordinates with the gradient shape functions (Jacobian)
-   
+
   # Do this for each cell in the mesh and
   # return a cell array with the maps and Jacobians
 end
 
-function get_cell_jacobian(gm::geomap)
-   return geomap.jacobian
-end
+# API
+get_cell_map(gm::GeoMap) = gm.maps
+get_cell_jacobian(gm::GeoMap) = gm.jacobian
 
 # FE Space 
 
@@ -120,29 +138,70 @@ struct FESpace
   fixed_values # e.g, a vector with values at the Dirichlet nodes 
 end
 
-function FESpace(mesh,reffe,uD) 
-   # uD is a function such that uD(a) = ua, uD(b) = ub
-  # extract the boundary nodes and evaluate uD in this nodes to get the fixed_values
-  # create the local to global Dof map (see lecture notes) 
+function FESpace(mesh,reffe,uD)
+  # uD is a function such that uD(a) = ua, uD(b) = ub
+  # evaluate uD at a and b to get the fixed_values
+  # create the local to global DOF map (see lecture notes). Careful: a vertex
+  # shared by two cells must receive the same global id from both cells.
+  # For p > 1, cell K owns the p+1 global nodes (K-1)p+1, ..., (K-1)p+p+1
+  # (consecutive cells share the interface node); in total N*p+1 nodes, the
+  # two end nodes fixed, the other N*p-1 free. No node coordinates are needed.
   # use the default constructor
 end
 
-# Implement the solver function 
+# API
+get_cell_dofs(V::FESpace) = V.node_map      # cell-wise local-to-global map
+get_fixed_values(V::FESpace) = V.fixed_values
+num_free_dofs #...
+
+# Implement the solver function
 
 # Initialise the local matrices/vectors
 # initialise the global matrix
 # for K in cells of the mesh
-#   for i,j in local cell dofs
-#     for gp in integration points
+#   for gp in integration points
+#     for i,j in local cell dofs
 #       A_K[i,j] += # here the expression for the Laplacian
-#       Idem forcing term and offset function term 
+#       Idem forcing term and offset function term
 #     end
 #   end
-#   Assemble the matrix
+#   Assemble the matrix (and vector) using the local-to-global map of K.
+#   When the global index of a local dof is negative (fixed), the column of
+#   A_K multiplies a known value and goes to the right-hand side (offset term).
 # end
 #
-# uf = A \ f
+# uf = A \ b
 
-# Check machine precission error for solution in FE space (method of manufactured solutions) 
-# Compute L2 and H1 error and check convergence 
+# FE function
+
+# After solving, uf contains only the FREE dof values. To evaluate the FE
+# function (errors, plots) we need a function of the FE space, i.e., the space
+# plus the vector of free values; the fixed values (and the local-to-global
+# map) already live in the space.
+
+struct FEFunction
+  space::FESpace
+  free_values
+end
+
+# Methods, each returning one entry per cell K:
+#   get_cell_values(uh)    -> [u_lg(1,K), ..., u_lg(p+1,K)], where u_a is
+#                             free_values[a] if a > 0 and fixed_values[-a] if a < 0
+#   get_cell_functions(uh) -> xhat -> sum_alpha u_lg(alpha,K) * phi_alpha(xhat)
+# (the restriction of u_h to K, in the reference coordinate; for the H1 error
+# you also need the derivative, phi_alpha' / J_K)
+get_cell_values #...
+get_cell_functions #...
+
+# To plot u_h or compute pointwise errors we also want to evaluate it at
+# arbitrary physical points:
+#   evaluate(uh, points) -> [u_h(x) for x in points]
+# For each x: find the cell K that contains it (easy for a uniform mesh), map
+# it back to the reference cell, xhat = Phi_K^{-1}(x) (Phi_K is linear, invert
+# it by hand), and evaluate the cell function of K at xhat.
+evaluate #...
+
+# Check machine precission error for solution in FE space (method of manufactured solutions)
+# Compute L2 and H1 error and check convergence (cell by cell, with a quadrature
+# of higher degree than the one used for assembly: the error is not a polynomial)
 

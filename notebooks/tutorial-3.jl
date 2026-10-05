@@ -99,6 +99,9 @@ function solve_heat(θ, τ, T, u0; f = t -> (x -> 0.0))
   return uhT, ts, norms, frames
 end
 
+# ╔═╡ 44b2f523-42a0-4a32-88ea-8e30125715d1
+
+
 # ╔═╡ c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e12
 md"# Test 1: three schemes, one rough initial condition
 
@@ -2053,6 +2056,7 @@ version = "1.13.0+0"
 # ╠═b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d11
 # ╟─a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c10
 # ╠═f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b09
+# ╠═44b2f523-42a0-4a32-88ea-8e30125715d1
 # ╟─c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e12
 # ╠═d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f13
 # ╠═e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a14
